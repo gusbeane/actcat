@@ -30,3 +30,16 @@ g_samples_galcen = g_samples.skycoord.transform_to(galcen)
 g_galcen_cyl = g_galcen.represent_as(CylindricalRepresentation, CylindricalDifferential)
 g_samples_galcen_cyl = g_samples_galcen.represent_as(CylindricalRepresentation, CylindricalDifferential)
 
+ts = np.linspace(0, 5000, 1) * u.Myr
+for central, samples_cyl in zip([g_galcen[0]], [g_samples_galcen_cyl[0]]):
+    # first estimate delta
+    o = Orbit(central)
+    o.integrate(ts, MWPotential2014)
+    delta = estimateDeltaStaeckel(MWPotential2014,o.R(ts),o.z(ts))
+
+    # construct the action finder
+    aAS = actionAngleStaeckel(pot=MWPotential2014,delta=float(delta),c=True)
+
+    # find all actions
+    R, vR, vT, z, vz = convert_to_galpy(samples_cyl, R0, v0)
+    actions = aAS(R, vR, vT, z, vz)
