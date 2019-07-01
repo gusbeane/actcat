@@ -2,3 +2,4 @@ act/
 data/*.fits
 .vscode
 Agama/
+*.npy
