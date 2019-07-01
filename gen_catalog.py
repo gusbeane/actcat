@@ -21,3 +21,12 @@ galcen = Galactocentric()
 R0 = 8
 v0 = 220
 
+g = GaiaData('data/gaiadr2_top100_100pc.fits')
+g_samples = g.get_error_samples(size=1024, rnd=np.random.RandomState(seed=162))
+
+g_galcen = g.skycoord.transform_to(galcen)
+g_samples_galcen = g_samples.skycoord.transform_to(galcen)
+
+g_galcen_cyl = g_galcen.represent_as(CylindricalRepresentation, CylindricalDifferential)
+g_samples_galcen_cyl = g_samples_galcen.represent_as(CylindricalRepresentation, CylindricalDifferential)
+
