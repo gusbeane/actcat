@@ -27,7 +27,7 @@ def convert_to_agama(g):
 
 galcen = Galactocentric()
 
-g = GaiaData('data/gaiadr2_top100_100pc.fits')
+g = GaiaData('../data/gaiadr2_top100_100pc.fits')
 g_samples = g.get_error_samples(size=1024, rnd=np.random.RandomState(seed=162))
 
 g_galcen = g.skycoord.transform_to(galcen)
