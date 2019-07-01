@@ -1,0 +1,6 @@
+Clustering algorithm in samples instead of points
+    - Gaussian mixture model
+    - do each integral as a monte carlo integral
+
+Redo Trick paper
+
