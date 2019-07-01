@@ -15,7 +15,8 @@ def convert_to_galpy(g, R0, v0):
     vT = g.differentials['s'].d_phi * R
     vT = vT.to(u.km/u.s, equivalencies=u.dimensionless_angles())
     vz = g.differentials['s'].d_z
-    return R.to_value(u.kpc)/R0, vR.to_value(u.km/u.s)/v0, vT.to_value(u.km/u.s)/v0, z.to_value(u.kpc)/R0, vz.to_value(u.km/u.s)/v0
+    return R.to_value(u.kpc)/R0, vR.to_value(u.km/u.s)/v0, vT.to_value(u.km/u.s)/v0,\
+         z.to_value(u.kpc)/R0, vz.to_value(u.km/u.s)/v0
 
 galcen = Galactocentric()
 R0 = 8
