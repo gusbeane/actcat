@@ -26,19 +26,35 @@ def convert_to_agama(g):
     vz = g.v_z.to_value(u.km/u.s)
     return np.transpose([x, y, z, vx, vy, vz])
 
-def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162):
-    galcen = Galactocentric()
-
+def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
+                R0=8.175, sigmaR0=0.013, z0=20.8, sigmaz0=0.3):
     
+    # generate the central galactocentric coordinate sytem
+    galcen = Galactocentric(galcen_distance=R0*u.kpc, z_sun=z0*u.pc)
+
+    # generate samples of the GC system
+    R0samples = np.random.normal(0, sigmaR0, nsamples)
+    z0samples = np.random.normal(0, sigmaz0, nsamples)
+    # galcen_samples = [Galactocentric(galcen_distance=R0p*u.kpc, z_sun=z0p*u.pc) 
+    #                     for R0p,z0p in zip(R0samples, z0samples)]
+
+    # generate Monte Carlo samples of the observed coordinates
     g_samples = gaiadata.get_error_samples(size=nsamples, rnd=np.random.RandomState(seed=seed))
 
     g_galcen = gaiadata.skycoord.transform_to(galcen)
+
+    # converting the samples, not sure how to do this correctly
+    # this implementation introduces small errors
     g_samples_galcen = g_samples.skycoord.transform_to(galcen)
 
     action_catalog = {}
 
     for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
         pos_vel = convert_to_agama(samples)
+        
+        pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
+        pos_vel[:,2] = np.add(pos_vel[:,2], z0samples*1000.) # assume z0 in pc
+
         actions, angles, freqs = af(pos_vel, angles=True)
         actions[:,[1, 2]] = actions[:,[2, 1]]
         angles[:,[1, 2]] = angles[:,[2, 1]]
