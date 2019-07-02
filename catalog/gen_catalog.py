@@ -54,7 +54,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
         pos_vel = convert_to_agama(samples)
         
         pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
-        pos_vel[:,2] = np.add(pos_vel[:,2], z0samples*1000.) # assume z0 in pc
+        pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
 
         actions, angles, freqs = af(pos_vel, angles=True)
         actions[:,[1, 2]] = actions[:,[2, 1]]
