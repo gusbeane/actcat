@@ -26,11 +26,11 @@ def convert_to_agama(g):
     vz = g.v_z.to_value(u.km/u.s)
     return np.transpose([x, y, z, vx, vy, vz])
 
-def gen_act_cat(gaiadata):
+def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162):
     galcen = Galactocentric()
 
     
-    g_samples = gaiadata.get_error_samples(size=1024, rnd=np.random.RandomState(seed=162))
+    g_samples = gaiadata.get_error_samples(size=nsamples, rnd=np.random.RandomState(seed=seed))
 
     g_galcen = gaiadata.skycoord.transform_to(galcen)
     g_samples_galcen = g_samples.skycoord.transform_to(galcen)
@@ -46,8 +46,8 @@ def gen_act_cat(gaiadata):
 
         action_catalog[str(gaia.source_id)] = {'act': actions, 'ang': angles, 'frq': freqs}
 
-    np.save('action_catalog.npy', action_catalog)
+    np.save(fout, action_catalog)
 
 if __name__ == '__main__':
     g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-    gen_act_cat(g)
+    gen_act_cat(g, 'action_catalog.npy')
