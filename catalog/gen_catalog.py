@@ -2,6 +2,7 @@ import numpy as np
 from pyia import GaiaData
 from astropy.coordinates import Galactocentric
 import astropy.units as u
+from tqdm import tqdm
 
 import agama
 
@@ -25,23 +26,28 @@ def convert_to_agama(g):
     vz = g.v_z.to_value(u.km/u.s)
     return np.transpose([x, y, z, vx, vy, vz])
 
-galcen = Galactocentric()
+def gen_act_cat(gaiadata):
+    galcen = Galactocentric()
 
-g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-g_samples = g.get_error_samples(size=1024, rnd=np.random.RandomState(seed=162))
+    
+    g_samples = gaiadata.get_error_samples(size=1024, rnd=np.random.RandomState(seed=162))
 
-g_galcen = g.skycoord.transform_to(galcen)
-g_samples_galcen = g_samples.skycoord.transform_to(galcen)
+    g_galcen = gaiadata.skycoord.transform_to(galcen)
+    g_samples_galcen = g_samples.skycoord.transform_to(galcen)
 
-action_catalog = {}
+    action_catalog = {}
 
-for gaia, central, samples in zip(g, g_galcen, g_samples_galcen):
-    pos_vel = convert_to_agama(samples)
-    actions, angles, freqs = af(pos_vel, angles=True)
-    actions[:,[1, 2]] = actions[:,[2, 1]]
-    angles[:,[1, 2]] = angles[:,[2, 1]]
-    freqs[:,[1, 2]] = freqs[:,[2, 1]]
+    for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
+        pos_vel = convert_to_agama(samples)
+        actions, angles, freqs = af(pos_vel, angles=True)
+        actions[:,[1, 2]] = actions[:,[2, 1]]
+        angles[:,[1, 2]] = angles[:,[2, 1]]
+        freqs[:,[1, 2]] = freqs[:,[2, 1]]
 
-    action_catalog[str(gaia.source_id)] = {'act': actions, 'ang': angles, 'frq': freqs}
+        action_catalog[str(gaia.source_id)] = {'act': actions, 'ang': angles, 'frq': freqs}
 
-np.save('action_catalog.npy', action_catalog)
+    np.save('action_catalog.npy', action_catalog)
+
+if __name__ == '__main__':
+    g = GaiaData('../data/gaiadr2_top100_100pc.fits')
+    gen_act_cat(g)
