@@ -12,8 +12,8 @@ def sclip(a, s=5):
 
 sigclip = SigmaClip(5)
 
-xrng_list = [[1.5, 7],
-             [2.9, 3.6],
+xrng_list = [[2.8, 3.5],
+             [3.1, 3.3],
              [2.5, 6]]
 
 for i, xrng in zip(range(3), xrng_list):
@@ -25,7 +25,7 @@ for i, xrng in zip(range(3), xrng_list):
     for k, x in zip(keys, ax.ravel()):
         to_plot = sigclip(np.log10(np.abs(actcat[k]['act'][:,i])))
         x.hist(to_plot, bins=100)
-        x.set_xlim(xrng)
+        # x.set_xlim(xrng)
     
     fig.tight_layout()
     fig.savefig('action_'+str(i)+'.pdf')
