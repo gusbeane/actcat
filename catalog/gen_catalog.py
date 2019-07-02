@@ -61,7 +61,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
         angles[:,[1, 2]] = angles[:,[2, 1]]
         freqs[:,[1, 2]] = freqs[:,[2, 1]]
 
-        action_catalog[str(gaia.source_id[0])] = {'act': actions, 'ang': angles, 'frq': freqs}
+        action_catalog[str(gaia.source_id[0])] = {'act': actions, 'ang': angles, 'frq': freqs, 'pos_vel': pos_vel}
 
     pickle.dump(action_catalog, open(fout, 'wb'))
 
