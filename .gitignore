@@ -3,3 +3,4 @@ data/*.fits
 .vscode
 Agama/
 *.npy
+*.pickle

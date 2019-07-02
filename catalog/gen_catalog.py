@@ -3,6 +3,7 @@ from pyia import GaiaData
 from astropy.coordinates import Galactocentric
 import astropy.units as u
 from tqdm import tqdm
+import pickle
 
 import agama
 
@@ -60,10 +61,10 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
         angles[:,[1, 2]] = angles[:,[2, 1]]
         freqs[:,[1, 2]] = freqs[:,[2, 1]]
 
-        action_catalog[str(gaia.source_id)] = {'act': actions, 'ang': angles, 'frq': freqs}
+        action_catalog[str(gaia.source_id[0])] = {'act': actions, 'ang': angles, 'frq': freqs}
 
-    np.save(fout, action_catalog)
+    pickle.dump(action_catalog, open(fout, 'wb'))
 
 if __name__ == '__main__':
     g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-    gen_act_cat(g, 'action_catalog.npy')
+    gen_act_cat(g, 'action_catalog.pickle')
