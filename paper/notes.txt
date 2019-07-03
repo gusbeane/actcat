@@ -4,3 +4,10 @@ Clustering algorithm in samples instead of points
 
 Redo Trick paper
 
+
+Cylinder, 250 pc, 2 kpc height
+
+MG vs. BP-RP, find FGK stars
+
+make Jz, thetaz for slices in Lz
+p(Jz) slice in Lz
