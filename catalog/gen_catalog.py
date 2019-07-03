@@ -44,9 +44,11 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
 
     g_galcen = gaiadata.skycoord.transform_to(galcen)
 
-    # converting the samples, not sure how to do this correctly
-    # this implementation introduces small errors
-    g_samples_galcen = g_samples.skycoord.transform_to(galcen)
+    # converting samples to galcen, some parallaxes will be negative due to sampling
+    # even though the input catalog must have only positive parallaxes
+    dist = g_samples.get_distance(min_parallax=1e-3*u.mas)
+    c = g_samples.get_skycoord(distance=dist)
+    g_samples_galcen = c.transform_to(galcen)
 
     action_catalog = {}
 
