@@ -5,3 +5,4 @@ Agama/
 *.npy
 *.pickle
 __pycache__/
+*.h5

@@ -3,7 +3,7 @@ from pyia import GaiaData
 from astropy.coordinates import Galactocentric
 import astropy.units as u
 from tqdm import tqdm
-import pickle
+import h5py as h
 
 import agama
 
@@ -50,7 +50,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     c = g_samples.get_skycoord(distance=dist)
     g_samples_galcen = c.transform_to(galcen)
 
-    action_catalog = {}
+    outh5 = h.File(fout, 'w')
 
     for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
         pos_vel = convert_to_agama(samples)
@@ -63,10 +63,11 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
         angles[:,[1, 2]] = angles[:,[2, 1]]
         freqs[:,[1, 2]] = freqs[:,[2, 1]]
 
-        action_catalog[str(gaia.source_id[0])] = {'act': actions, 'ang': angles, 'frq': freqs, 'pos_vel': pos_vel}
+        data = np.c_[actions, angles, freqs, pos_vel]
+        outh5.create_dataset(str(gaia.source_id[0]), data=data)
 
-    pickle.dump(action_catalog, open(fout, 'wb'))
+    outh5.close()
 
 if __name__ == '__main__':
     g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-    gen_act_cat(g, 'action_catalog.pickle')
+    gen_act_cat(g, 'action_catalog.h5')
