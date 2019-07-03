@@ -4,3 +4,4 @@ data/*.fits
 Agama/
 *.npy
 *.pickle
+__pycache__/
