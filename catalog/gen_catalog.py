@@ -10,10 +10,10 @@ import agama
 agama.setUnits(mass=1, length=1, velocity=1)
 
 # import the MW potential from gala
-bulge = agama.Potential(type='Dehnen', gamma=1, mass=5E9, a=1.0)           
-nucleus = agama.Potential(type='Dehnen', gamma=1, mass=1.71e+09, a=0.07)   
-disk = agama.Potential(type='MiyamotoNagai', mass=6.80e+10, a=3.0, b=0.28) 
-halo = agama.Potential(type='NFW', mass=5.4E11, a=15.62)                  
+bulge = agama.Potential(type='Dehnen', gamma=1, mass=5E9, scaleRadius=1.0)           
+nucleus = agama.Potential(type='Dehnen', gamma=1, mass=1.71E09, scaleRadius=0.07)   
+disk = agama.Potential(type='MiyamotoNagai', mass=6.80e+10, scaleRadius=3.0, scaleHeight=0.28) 
+halo = agama.Potential(type='NFW', mass=5.4E11, scaleRadius=15.62)                  
 mwpot = agama.Potential(bulge, nucleus, disk, halo)
 
 af = agama.ActionFinder(mwpot, interp=False)
