@@ -4,6 +4,7 @@ from astropy.coordinates import Galactocentric
 import astropy.units as u
 from tqdm import tqdm
 import h5py as h
+from joblib import Parallel, delayed
 
 import agama
 
@@ -27,8 +28,24 @@ def convert_to_agama(g):
     vz = g.v_z.to_value(u.km/u.s)
     return np.transpose([x, y, z, vx, vy, vz])
 
+def one_loop(af, samples, R0samples, z0samples):
+    pos_vel = convert_to_agama(samples)
+        
+    pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
+    pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
+
+    actions, angles, freqs = af(pos_vel, angles=True)
+    actions[:,[1, 2]] = actions[:,[2, 1]]
+    angles[:,[1, 2]] = angles[:,[2, 1]]
+    freqs[:,[1, 2]] = freqs[:,[2, 1]]
+
+    data = np.c_[actions, angles, freqs, pos_vel]
+
+    return data
+
 def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
-                R0=8.175, sigmaR0=0.013, z0=20.8, sigmaz0=0.3):
+                R0=8.175, sigmaR0=0.013, z0=20.8, sigmaz0=0.3,
+                ncore=1, chunk=200):
     
     # generate the central galactocentric coordinate sytem
     galcen = Galactocentric(galcen_distance=R0*u.kpc, z_sun=z0*u.pc)
@@ -51,23 +68,35 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     g_samples_galcen = c.transform_to(galcen)
 
     outh5 = h.File(fout, 'w')
-
-    for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
-        pos_vel = convert_to_agama(samples)
+    if ncore==1:
+        for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
+            pos_vel = convert_to_agama(samples)
         
-        pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
-        pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
+            pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
+            pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
 
-        actions, angles, freqs = af(pos_vel, angles=True)
-        actions[:,[1, 2]] = actions[:,[2, 1]]
-        angles[:,[1, 2]] = angles[:,[2, 1]]
-        freqs[:,[1, 2]] = freqs[:,[2, 1]]
+            actions, angles, freqs = af(pos_vel, angles=True)
+            actions[:,[1, 2]] = actions[:,[2, 1]]
+            angles[:,[1, 2]] = angles[:,[2, 1]]
+            freqs[:,[1, 2]] = freqs[:,[2, 1]]
 
-        data = np.c_[actions, angles, freqs, pos_vel]
-        outh5.create_dataset(str(gaia.source_id[0]), data=data)
+            data = np.c_[actions, angles, freqs, pos_vel]
+            outh5.create_dataset(str(gaia.source_id[0]), data=data)
+    
+    else:
+        gaia_ids = gaiadata.source_id.tolist()
+        gaia_ids_split = np.split(gaia_ids, chunk)
+        gaia_galcen_split = np.split(g_galcen, chunk)
+        samples_split = np.split(g_samples_galcen, chunk)
+        for c_gaia_ids, c_gaia_galcen, c_samples in tqdm(zip(gaia_ids_split, gaia_galcen_split, samples_split)):
+            out = Parallel(n_jobs=ncore) (delayed(one_loop)(af, s, R0samples, z0samples)
+                                            for s in c_samples)
+            for data, this_id in zip(out, c_gaia_ids):
+                outh5.create_dataset(this_id, data=data)
 
     outh5.close()
 
 if __name__ == '__main__':
     g = GaiaData('../data/gaiadr2_top100_100pc.fits')
     gen_act_cat(g, 'action_catalog.h5')
+    # gen_act_cat(g, 'action_catalog.h5', ncore=2, chunk=10)
