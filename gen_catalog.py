@@ -18,7 +18,7 @@ mwpot = agama.Potential(bulge, nucleus, disk, halo)
 
 af = agama.ActionFinder(mwpot, interp=False)
 
-def convert_to_agama(g):
+def convert_posvel_to_agama(g):
     x = g.x.to_value(u.kpc)
     y = g.y.to_value(u.kpc)
     z = g.z.to_value(u.kpc)
@@ -53,7 +53,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     outh5 = h.File(fout, 'w')
 
     for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
-        pos_vel = convert_to_agama(samples)
+        pos_vel = convert_posvel_to_agama(samples)
         
         pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
         pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
