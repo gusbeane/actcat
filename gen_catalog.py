@@ -28,7 +28,8 @@ def convert_posvel_to_agama(g):
     return np.transpose([x, y, z, vx, vy, vz])
 
 def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
-                R0=8.175, sigmaR0=0.013, z0=20.8, sigmaz0=0.3):
+                R0=8.175, sigmaR0=0.013, z0=20.8, sigmaz0=0.3,
+                min_parallax=1e-3*u.mas):
     
     # generate the central galactocentric coordinate sytem
     galcen = Galactocentric(galcen_distance=R0*u.kpc, z_sun=z0*u.pc)
@@ -46,7 +47,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
 
     # converting samples to galcen, some parallaxes will be negative due to sampling
     # even though the input catalog must have only positive parallaxes
-    dist = g_samples.get_distance(min_parallax=1e-3*u.mas)
+    dist = g_samples.get_distance(min_parallax=min_parallax)
     c = g_samples.get_skycoord(distance=dist)
     g_samples_galcen = c.transform_to(galcen)
 
