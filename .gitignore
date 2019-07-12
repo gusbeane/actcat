@@ -6,3 +6,9 @@ Agama/
 *.pickle
 __pycache__/
 *.h5
+
+paper/*.pdf
+paper/*.aux
+paper/*.log
+paper/*.out
+
