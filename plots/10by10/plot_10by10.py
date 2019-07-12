@@ -22,8 +22,8 @@ for i, xrng in zip(range(3), xrng_list):
     actcat = h.File('../../catalog/action_catalog.h5', 'r')
     keys = list(actcat.keys())
 
-    for k, x in zip(keys, ax.ravel()):
-        to_plot = sigclip(np.log10(np.abs(actcat[k][:,i])))
+    for samples, x in zip(actcat['actions'], ax.ravel()):
+        to_plot = sigclip(np.log10(np.abs(samples[:,i])))
         x.hist(to_plot, bins=100)
         # x.set_xlim(xrng)
     
