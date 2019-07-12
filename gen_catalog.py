@@ -35,10 +35,8 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     galcen = Galactocentric(galcen_distance=R0*u.kpc, z_sun=z0*u.pc)
 
     # generate samples of the GC system
-    R0samples = np.random.normal(0, sigmaR0, nsamples)
-    z0samples = np.random.normal(0, sigmaz0, nsamples)
-    # galcen_samples = [Galactocentric(galcen_distance=R0p*u.kpc, z_sun=z0p*u.pc) 
-    #                     for R0p,z0p in zip(R0samples, z0samples)]
+    # R0samples = np.random.normal(0, sigmaR0, nsamples)
+    # z0samples = np.random.normal(0, sigmaz0, nsamples)
 
     # generate Monte Carlo samples of the observed coordinates
     g_samples = gaiadata.get_error_samples(size=nsamples, rnd=np.random.RandomState(seed=seed))
@@ -56,8 +54,8 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     for gaia, central, samples in tqdm(zip(gaiadata, g_galcen, g_samples_galcen)):
         pos_vel = convert_posvel_to_agama(samples)
         
-        pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
-        pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
+        # pos_vel[:,0] = np.add(pos_vel[:,0], R0samples)
+        # pos_vel[:,2] = np.add(pos_vel[:,2], z0samples/1000.) # assume z0 in pc
 
         actions, angles, freqs = af(pos_vel, angles=True)
         actions[:,[1, 2]] = actions[:,[2, 1]]
@@ -71,4 +69,4 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
 
 if __name__ == '__main__':
     g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-    gen_act_cat(g, 'action_catalog.h5')
+    gen_act_cat(g, 'action_catalog.h5', nsamples=256)
