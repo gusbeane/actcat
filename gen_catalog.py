@@ -68,5 +68,5 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
     outh5.close()
 
 if __name__ == '__main__':
-    g = GaiaData('../data/gaiadr2_top100_100pc.fits')
-    gen_act_cat(g, 'action_catalog.h5', nsamples=256)
+    g = GaiaData('data/gaiadr2_top100_100pc.fits')
+    gen_act_cat(g, 'catalog/action_catalog.h5', nsamples=256)
