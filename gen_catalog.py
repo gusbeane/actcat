@@ -84,7 +84,7 @@ def gen_act_cat(gaiadata, fout, nsamples=1024, seed=162,
         f.create_dataset('angles_central', data=angles_c)
         f.create_dataset('freqs_central', data=freqs_c)
 
-        f.create_dataset('source_id', data=gaiadata.source_id)
+        f.create_dataset('source_id', data=gaiadata.source_id, dtype='i8')
 
     return None
 

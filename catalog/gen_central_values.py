@@ -52,6 +52,6 @@ fout.create_dataset('actions_central', data=actions_central)
 fout.create_dataset('angles_central', data=angles_central)
 fout.create_dataset('freqs_central', data=freqs_central)
 fout.create_dataset('posvel_median', data=med_posvel)
-fout.create_dataset('source_id', data=source_id)
+fout.create_dataset('source_id', data=source_id, dtype='i8')
 
 fout.close()
